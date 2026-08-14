@@ -4,21 +4,40 @@ English | [中文](README.md)
 
 ![Settings page](docs/screenshots/settings.png)
 
-dsh-session-management is a session management plugin for [DeepSeek Harness](https://github.com/deepseek-ai/dsh) (DSH) Web: manage chat sessions from the Settings panel — archive, unarchive, **truly delete local chat records**, and export data. The UI follows a restrained Apple/macOS visual style and is fully bilingual (follows the DSH locale setting).
+dsh-session-management is a session management plugin for DeepSeek Harness (DSH) Web. From the Settings panel you can manage chat sessions in one place: archive, unarchive, **truly delete local chat records**, and export data. The UI follows a restrained Apple/macOS design language and is fully bilingual, switching instantly with the DSH locale setting.
 
 ![Archived chats manage dialog](docs/screenshots/manage.png)
 
 ## Features
 
-- **Archived chats management**: click "Manage" to open the management dialog
-  - Two grouping views: **by workspace** / **by month** (`August 2026`, `July 2026`...)
-  - Sort by created / updated date, ascending / descending
-  - Group collapse / expand all / collapse all
-  - Per-group batch actions: unarchive this group, **delete the archived chats of this group** (only the group's archived sessions are affected)
-- **Archive all chats**: archive everything at once (records are kept, only hidden from the list)
-- **Delete all chats**: truly delete all local chat records (running sessions are skipped)
-- **Export data**: official-format ZIP export (session log `session.jsonl` + subagents + media attachments)
-- **Bilingual UI**: switches instantly with Settings > General > Language
+### Archived chats management
+
+Open the manage dialog and switch between two grouping views:
+
+- **By workspace**: one group per workspace, rows sorted by time;
+- **By month**: grouped by year-month (`August 2026`, `July 2026`...), so archives across years are immediately clear.
+
+Sort by created / updated date (ascending / descending), collapse or expand groups at will, and run batch actions per group — unarchive the group, or **delete the archived chats of the group** (only the group's archived sessions are affected; unarchived records are never touched).
+
+| Grouping & sorting | Group-level batch actions |
+| --- | --- |
+| ![Manage dialog](docs/screenshots/manage.png) | ![Manage dialog](docs/screenshots/manage.png) |
+
+### Archive all chats
+
+Archive every session at once: records stay fully intact, merely hidden from the sidebar list — unarchive them any time from the manage dialog.
+
+### Delete all chats
+
+**Truly delete** local chat records: removes the session log files on disk (`session.jsonl` / `session.jsonl.zstd` and its twin), and cleans up workspace accounting and archive marks. Running sessions are skipped automatically to prevent logs from being rewritten.
+
+### Export data
+
+Reuses the official export endpoint to produce official-format ZIP archives per root session (`dsh-session-<id>.zip`): session log, subagent sessions and media attachments in one package, byte-compatible with the official tooling.
+
+### Bilingual UI
+
+Copy switches instantly with Settings > General > Language; documentation and UI are maintained in both languages.
 
 ## Installation
 
@@ -26,13 +45,15 @@ DSH plugins mount through a **profile** (`dsh web` uses the `web` profile). **Re
 
 ### Option 1: from npm (recommended)
 
-The plugin is published to npm as `dsh-session-management` — install it with one command:
+The plugin is published to npm as `dsh-session-management` — one command:
 
 ```sh
 dsh plugin --profile web add dsh-session-management
 ```
 
-After installing, restart `dsh web` and open Settings to find the "Session Manager" entry. Pin the version as needed; upgrade with `dsh plugin --profile web update dsh-session-management`.
+After installing, restart `dsh web` and open Settings to find "Session Manager". Upgrade: `dsh plugin --profile web update dsh-session-management`.
+
+> On first install, if `ERR_PNPM_IGNORED_BUILDS` appears (pnpm refuses build scripts), add the reported packages to `allowBuilds` in the profile's `pnpm-workspace.yaml` and re-run.
 
 ### Option 2: from GitHub
 
@@ -47,9 +68,9 @@ powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 bash scripts/install.sh
 ```
 
-The installer is idempotent and does two things:
+The installer is idempotent and safe to re-run. It does two things:
 
-1. Copies the package into `$DSH_HOME/profiles/node_modules/dsh-session-management/`
+1. Copies the package into `$DSH_HOME/profiles/node_modules/dsh-session-management/`;
 2. Registers the loader entry in `$DSH_HOME/profiles/web/cordis.patch.yml`:
 
 ```yaml
@@ -58,32 +79,19 @@ The installer is idempotent and does two things:
       name: dsh-session-management
 ```
 
-### Manual installation
+### Verification & uninstall
 
-If the scripts are not applicable, do the two steps above by hand: place `lib/` and `package.json` under `$DSH_HOME/profiles/node_modules/dsh-session-management/`, and append the insert entry to `$DSH_HOME/profiles/web/cordis.patch.yml`.
+After installing, restart `dsh web` — the "Session Manager" entry appears in Settings. You can also confirm the plugin layer with `dsh --profile web --dump-config`. If no entry shows up, the usual culprit is a missing restart.
 
-## Usage
-
-1. Restart `dsh web`, then open **Settings**
-2. The sidebar shows a "**Session Manager**" entry
-3. Use it to manage archived chats, archive all, delete all, or export data
-
-## Uninstall
-
-```sh
-rm -rf ~/.dsh/profiles/node_modules/dsh-session-management
-```
-
-Also remove the corresponding insert entry from `$DSH_HOME/profiles/web/cordis.patch.yml`, then restart `dsh web`.
+To uninstall, remove `$DSH_HOME/profiles/node_modules/dsh-session-management/`, delete the insert entry from `cordis.patch.yml`, and restart `dsh web`.
 
 ## How it works & limitations
 
-- **Archive**: uses the official `workspaceRegistry.archiveSession` API; the archive set is persisted in the workspace domain and synced to clients through the official frame mechanism. **Unarchive** is not provided by the official API, so the plugin updates the workspace domain archive set directly (the host broadcasts the change through `domain/changed`).
-- **Delete = truly delete**: locates the session log files (`session.jsonl` / `session.jsonl.zstd`, including the twin compressed file) and removes them via the system command; then cleans up workspace accounting and archive marks; the search index is reconciled automatically by the official SQLite backend.
-- **Export**: reuses the official `/api/session.export` endpoint, downloading one ZIP per root session (`dsh-session-<id>.zip`), byte-compatible with the official format.
+- **Archive**: built on the official `workspaceRegistry.archiveSession`; the archive set is persisted in the workspace domain and synced to clients via the official frame mechanism. **Unarchive** is not provided by the official API, so the plugin updates the workspace domain archive set directly; the change is broadcast through the official `domain/changed` event.
+- **Delete means delete**: the session log files (including the zstd twin) are located and removed via the system command, then workspace accounting and archive marks are cleaned up; the search index is reconciled automatically by the official SQLite backend.
 - **Limitations**:
   - Running sessions are refused for deletion (to avoid logs being rewritten);
-  - Image attachments (content-addressed storage, possibly shared across sessions) are not removed with a session;
+  - Image attachments use content-addressed storage and may be shared across sessions, so they are not removed with a session;
   - Subagent sessions are independent records; deleting a parent session does not cascade (they can be deleted individually).
 
 ## License
@@ -92,4 +100,4 @@ Also remove the corresponding insert entry from `$DSH_HOME/profiles/web/cordis.p
 
 ## Credits
 
-Installation mechanics and documentation structure reference [dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui); the UI follows its [Pinguo/Apple design system](https://github.com/zhu1090093659/dsh-web-ui).
+Installation mechanics and documentation structure reference [dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui); the UI follows its Pinguo/Apple design language.

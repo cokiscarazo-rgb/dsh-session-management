@@ -4,25 +4,44 @@
 
 ![会话管理设置页](docs/screenshots/settings.png)
 
-dsh-session-management 是 [DeepSeek Harness](https://github.com/deepseek-ai/dsh)（DSH）Web 的会话管理插件：在「设置」面板内集中管理聊天会话——归档、取消归档、**真正删除本地聊天记录**、导出数据。界面采用克制的 Apple/macOS 风格，支持中英双语（跟随 DSH 语言设置）。
+dsh-session-management 是 DeepSeek Harness（DSH）Web 的会话管理插件。在「设置」面板内集中管理聊天会话：归档、取消归档、**真正删除本地聊天记录**、导出数据。界面采用克制的 Apple/macOS 设计语言，支持中英双语，随 DSH 语言设置即时切换。
 
 ![已归档聊天管理弹窗](docs/screenshots/manage.png)
 
 ## 功能
 
-- **已归档的聊天管理**：点击「管理」弹出管理窗口
-  - 两种分组视图：**按工作区** / **按月份**（`2026年8月`、`2026年7月`…）
-  - 按创建日期 / 更新日期排序，升序 / 降序
-  - 分组折叠 / 全部展开 / 全部折叠
-  - 按组批量操作：取消归档该组、**删除该组已归档的聊天**（仅作用于该组的归档会话）
-- **归档所有聊天**：一键归档全部（保留记录，仅从列表隐藏）
-- **删除所有聊天**：真正删除全部本地聊天记录（跳过运行中的会话）
-- **导出数据**：与官方一致的 ZIP 导出（会话日志 `session.jsonl` + 子代理 + 媒体附件）
-- **中英双语**：跟随「设置 → 通用设置 → 语言」即时切换
+### 已归档的聊天管理
+
+点击「管理」打开管理窗口，两种分组视图随心切换：
+
+- **按工作区**：每个工作区一个分组，组内按时间排序；
+- **按月份**：按年月分组（`2026年8月`、`2026年7月`…），月份自动携带年份，跨年归档一目了然。
+
+支持按创建日期 / 更新日期排序（升序 / 降序）、分组折叠与一键展开、按组批量操作——取消归档该组、**删除该组已归档的聊天**（仅作用于该组的归档会话，不影响未归档记录）。
+
+| 分组与排序 | 组头批量操作 |
+| --- | --- |
+| ![归档管理弹窗](docs/screenshots/manage.png) | ![归档管理弹窗](docs/screenshots/manage.png) |
+
+### 归档所有聊天
+
+一键归档全部会话：记录完整保留，仅从侧边栏列表隐藏，随时可在管理窗口取消归档。
+
+### 删除所有聊天
+
+**真正删除**本地聊天记录：删除磁盘上的会话日志文件（`session.jsonl` / `session.jsonl.zstd` 及对偶文件），并同步清理工作区记账与归档标记。运行中的会话自动跳过，防止日志被写回。
+
+### 导出数据
+
+复用官方导出端点，为每个根会话生成与官方格式一致的 ZIP 归档（`dsh-session-<id>.zip`）：会话日志、子代理会话与媒体附件一并打包，字节级兼容官方工具。
+
+### 中英双语
+
+界面文案随「设置 → 通用设置 → 语言」即时切换，中英文档与界面同步维护。
 
 ## 安装
 
-DSH 插件通过 **profile** 挂载（`dsh web` 对应 `web` profile），安装后需**重启 `dsh web`** 生效。
+DSH 插件通过 **profile** 挂载（`dsh web` 对应 `web` profile）。安装后需**重启 `dsh web`** 生效。
 
 ### 方式一：从 npm 安装（推荐）
 
@@ -32,9 +51,11 @@ DSH 插件通过 **profile** 挂载（`dsh web` 对应 `web` profile），安装
 dsh plugin --profile web add dsh-session-management
 ```
 
-装完重启 `dsh web`，打开设置即可看到「会话管理」入口。版本固定为最新发布版；升级时使用 `dsh plugin --profile web update dsh-session-management`。
+装完重启 `dsh web`，打开「设置」即可看到「会话管理」入口。升级：`dsh plugin --profile web update dsh-session-management`。
 
-### 方式二：从 GitHub 安装
+> 首次安装若提示 `ERR_PNPM_IGNORED_BUILDS`（pnpm 拒绝依赖的构建脚本），按提示把相关包加入 profile 的 `pnpm-workspace.yaml` `allowBuilds` 后重新执行即可。
+
+### 方式二：从 GitHub 仓库安装
 
 ```sh
 git clone https://github.com/cokiscarazo-rgb/dsh-session-management.git
@@ -47,9 +68,9 @@ powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 bash scripts/install.sh
 ```
 
-安装脚本会完成两件事（幂等，可重复执行）：
+安装脚本幂等，重复执行安全。它会完成两步：
 
-1. 复制插件包到 `$DSH_HOME/profiles/node_modules/dsh-session-management/`
+1. 复制插件包到 `$DSH_HOME/profiles/node_modules/dsh-session-management/`；
 2. 在 `$DSH_HOME/profiles/web/cordis.patch.yml` 注册 loader 条目：
 
 ```yaml
@@ -58,36 +79,20 @@ bash scripts/install.sh
       name: dsh-session-management
 ```
 
-### 手动安装
+### 验证与卸载
 
-不适用安装脚本时，也可手动完成上述两步：把 `lib/` 与 `package.json` 放进
-`$DSH_HOME/profiles/node_modules/dsh-session-management/`，并在
-`$DSH_HOME/profiles/web/cordis.patch.yml` 末尾追加上面的 insert 条目。
+安装成功后重启 `dsh web`，打开「设置」出现「会话管理」即生效；也可用 `dsh --profile web --dump-config` 确认插件配置层已挂载。若侧边栏没有新入口，多半是安装后没有重启。
 
-## 使用
-
-1. 重启 `dsh web` 后，打开 **设置（Settings）**
-2. 左侧列表出现「**会话管理**」条目
-3. 进入后按需执行：已归档的聊天（管理）/ 归档所有聊天 / 删除所有聊天 / 导出数据
-
-## 卸载
-
-```sh
-# 移除安装目录与 patch 条目后重启
-rm -rf ~/.dsh/profiles/node_modules/dsh-session-management
-```
-
-同时从 `$DSH_HOME/profiles/web/cordis.patch.yml` 中删除对应 insert 条目，重启 `dsh web` 即可。
+卸载：移除 `$DSH_HOME/profiles/node_modules/dsh-session-management/` 目录，并从 `cordis.patch.yml` 删除对应 insert 条目，重启 `dsh web`。
 
 ## 工作原理与边界
 
-- **归档**：使用官方 `workspaceRegistry.archiveSession`，归档集持久化于 workspace 域，客户端经官方帧机制自动同步；**取消归档**为官方未提供的操作，插件直接更新 workspace 域归档集合（官方会经 `domain/changed` 自动广播给客户端）。
-- **删除 = 真正删除**：定位会话日志文件（`session.jsonl` / `session.jsonl.zstd`，含对偶压缩文件），经系统命令删除；随后清理 workspace 记账与归档标记；搜索索引由官方 SQLite 自动 reconcile 清理。
-- **导出**：复用官方 `/api/session.export` 端点，逐 root 会话下载 ZIP（`dsh-session-<id>.zip`），格式与官方一致。
+- **归档**：基于官方 `workspaceRegistry.archiveSession`，归档集持久化于 workspace 域，客户端经官方帧机制自动同步；**取消归档**为官方未提供的操作，插件直接更新 workspace 域归档集合，变化经官方 `domain/changed` 事件自动广播。
+- **删除即真删**：定位会话日志文件（含 zstd 对偶文件）后经系统命令删除，随后清理工作区记账与归档标记；搜索索引由官方 SQLite 自动 reconcile 清理。
 - **边界说明**：
   - 运行中的会话拒绝删除（避免日志被重新写回）；
-  - 聊天中的图片附件（content-addressed 存储，可能被多会话共享）不会随会话删除；
-  - 子代理会话为独立记录，删除父会话不会级联删除（可单独删除）。
+  - 聊天中的图片附件采用 content-addressed 存储、可能被多会话共享，删除会话不会连带删除附件；
+  - 子代理会话为独立记录，删除父会话不级联删除（可单独删除）。
 
 ## License
 
@@ -95,4 +100,4 @@ rm -rf ~/.dsh/profiles/node_modules/dsh-session-management
 
 ## 致谢
 
-安装机制与文档结构参考 [dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)；界面视觉参考其 [Pinguo/Apple 设计系统](https://github.com/zhu1090093659/dsh-web-ui)。
+安装机制与文档结构参考 [dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)，界面视觉参考其 Pinguo/Apple 设计语言。
