@@ -97,7 +97,3 @@ To uninstall, remove `$DSH_HOME/profiles/node_modules/dsh-session-management/`, 
 ## License
 
 [MIT](LICENSE) © cokiscarazo-rgb
-
-## Credits
-
-Installation mechanics and documentation structure reference [dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui); the UI follows its Pinguo/Apple design language.

@@ -97,7 +97,3 @@ bash scripts/install.sh
 ## License
 
 [MIT](LICENSE) © cokiscarazo-rgb
-
-## 致谢
-
-安装机制与文档结构参考 [dsh-web-ui](https://github.com/zhu1090093659/dsh-web-ui)，界面视觉参考其 Pinguo/Apple 设计语言。
