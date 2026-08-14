@@ -24,11 +24,15 @@ dsh-session-management 是 [DeepSeek Harness](https://github.com/deepseek-ai/dsh
 
 DSH 插件通过 **profile** 挂载（`dsh web` 对应 `web` profile），安装后需**重启 `dsh web`** 生效。
 
-### 方式一：从 npm 安装（推荐，若已发布）
+### 方式一：从 npm 安装（推荐）
+
+插件已发布到 npm（`dsh-session-management`），一条命令装齐：
 
 ```sh
 dsh plugin --profile web add dsh-session-management
 ```
+
+装完重启 `dsh web`，打开设置即可看到「会话管理」入口。版本固定为最新发布版；升级时使用 `dsh plugin --profile web update dsh-session-management`。
 
 ### 方式二：从 GitHub 安装
 

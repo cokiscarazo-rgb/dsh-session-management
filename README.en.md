@@ -24,11 +24,15 @@ dsh-session-management is a session management plugin for [DeepSeek Harness](htt
 
 DSH plugins mount through a **profile** (`dsh web` uses the `web` profile). **Restart `dsh web`** after installing.
 
-### Option 1: from npm (recommended, once published)
+### Option 1: from npm (recommended)
+
+The plugin is published to npm as `dsh-session-management` — install it with one command:
 
 ```sh
 dsh plugin --profile web add dsh-session-management
 ```
+
+After installing, restart `dsh web` and open Settings to find the "Session Manager" entry. Pin the version as needed; upgrade with `dsh plugin --profile web update dsh-session-management`.
 
 ### Option 2: from GitHub
 
