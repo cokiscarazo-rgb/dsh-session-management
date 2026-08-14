@@ -43,17 +43,33 @@ dsh-session-management 是 DeepSeek Harness（DSH）Web 的会话管理插件。
 
 DSH 插件通过 **profile** 挂载（`dsh web` 对应 `web` profile）。安装后需**重启 `dsh web`** 生效。
 
+**前置要求**：Node.js（含 npm）；`dsh plugin` 依赖 `pnpm`（缺失时见下方「常见问题」）。
+
 ### 方式一：从 npm 安装（推荐）
 
-插件已发布到 npm（`dsh-session-management`），一条命令装齐：
+插件已发布到 npm（`dsh-session-management`）。安装命令取决于你如何运行 dsh：
 
-```sh
-dsh plugin --profile web add dsh-session-management
-```
+- **全局安装 dsh**（`dsh` 命令可直接使用）：
 
-装完重启 `dsh web`，打开「设置」即可看到「会话管理」入口。升级：`dsh plugin --profile web update dsh-session-management`。
+  ```sh
+  dsh plugin --profile web add dsh-session-management
+  ```
 
-> 首次安装若提示 `ERR_PNPM_IGNORED_BUILDS`（pnpm 拒绝依赖的构建脚本），按提示把相关包加入 profile 的 `pnpm-workspace.yaml` `allowBuilds` 后重新执行即可。
+- **通过 npx 运行 dsh**（未全局安装，平时用 `npx @deepseek-ai/dsh web` 启动）：
+
+  ```sh
+  npx -y @deepseek-ai/dsh plugin --profile web add dsh-session-management
+  ```
+
+装完重启 `dsh web`，打开「设置」即可看到「会话管理」入口。升级：将 `add` 换成 `update`（非全局安装时同样加 `npx -y @deepseek-ai/dsh` 前缀）。
+
+> **版本提示**：若 npm/pnpm 的元数据缓存或镜像源同步延迟，导致安装到旧版本（提示 `declares no dsh.bundle`），请指定最新版本号重装：
+>
+> ```sh
+> npx -y @deepseek-ai/dsh plugin --profile web add dsh-session-management@<最新版本号>
+> ```
+>
+> 查询最新版本：`npm view dsh-session-management version`。
 
 ### 方式二：从 GitHub 仓库安装
 
@@ -81,9 +97,25 @@ bash scripts/install.sh
 
 ### 验证与卸载
 
-安装成功后重启 `dsh web`，打开「设置」出现「会话管理」即生效；也可用 `dsh --profile web --dump-config` 确认插件配置层已挂载。若侧边栏没有新入口，多半是安装后没有重启。
+安装成功后重启 `dsh web`，打开「设置」出现「会话管理」即生效；也可用 `dsh --profile web --dump-config`（非全局安装加 `npx -y @deepseek-ai/dsh` 前缀）确认插件配置层已挂载。若没有新入口，多半是安装后没有重启。
 
-卸载：移除 `$DSH_HOME/profiles/node_modules/dsh-session-management/` 目录，并从 `cordis.patch.yml` 删除对应 insert 条目，重启 `dsh web`。
+卸载：`dsh plugin --profile web remove dsh-session-management`（非全局安装加 `npx -y @deepseek-ai/dsh` 前缀），重启 `dsh web`；手动安装的则移除 `$DSH_HOME/profiles/node_modules/dsh-session-management/` 目录并删除 `cordis.patch.yml` 中的 insert 条目。
+
+### 常见问题
+
+- **提示 `'pnpm' 不是内部或外部命令` / `pnpm: command not found`**：`dsh plugin` 内部依赖 pnpm，先安装它：
+
+  ```sh
+  npm install -g pnpm
+  ```
+
+  或使用 Node 自带的 corepack：`corepack enable pnpm`。验证：`pnpm --version`。
+
+- **安装后仍是旧版本 / 提示 `declares no dsh.bundle`**：npm/pnpm 元数据缓存或镜像源同步延迟所致。先确认 registry 源：`pnpm config get registry`（若为 npmmirror 等镜像，可切回官方源 `pnpm config set registry https://registry.npmjs.org/`），然后指定版本号重装（见上「版本提示」）。
+
+- **首次安装提示 `ERR_PNPM_IGNORED_BUILDS`**：pnpm 拒绝依赖的构建脚本，按提示把相关包加入 profile 的 `pnpm-workspace.yaml` `allowBuilds` 后重新执行即可。
+
+- **设置里没有「会话管理」入口**：确认已重启 `dsh web`；再确认 `$DSH_HOME/profiles/web/cordis.patch.yml` 中存在 `id: dsh-session-management` 的 insert 条目。
 
 ## 工作原理与边界
 

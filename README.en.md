@@ -43,17 +43,33 @@ Copy switches instantly with Settings > General > Language; documentation and UI
 
 DSH plugins mount through a **profile** (`dsh web` uses the `web` profile). **Restart `dsh web`** after installing.
 
+**Prerequisites**: Node.js (with npm); `dsh plugin` relies on `pnpm` (see FAQ if missing).
+
 ### Option 1: from npm (recommended)
 
-The plugin is published to npm as `dsh-session-management` — one command:
+The plugin is published to npm as `dsh-session-management`. The command depends on how you run dsh:
 
-```sh
-dsh plugin --profile web add dsh-session-management
-```
+- **Global dsh install** (`dsh` is on your PATH):
 
-After installing, restart `dsh web` and open Settings to find "Session Manager". Upgrade: `dsh plugin --profile web update dsh-session-management`.
+  ```sh
+  dsh plugin --profile web add dsh-session-management
+  ```
 
-> On first install, if `ERR_PNPM_IGNORED_BUILDS` appears (pnpm refuses build scripts), add the reported packages to `allowBuilds` in the profile's `pnpm-workspace.yaml` and re-run.
+- **Running dsh via npx** (not installed globally; you start it with `npx @deepseek-ai/dsh web`):
+
+  ```sh
+  npx -y @deepseek-ai/dsh plugin --profile web add dsh-session-management
+  ```
+
+After installing, restart `dsh web` and open Settings to find "Session Manager". To upgrade, replace `add` with `update` (keep the `npx -y @deepseek-ai/dsh` prefix when applicable).
+
+> **Version note**: if npm/pnpm metadata caching or a mirror registry causes an older version to be installed (warning `declares no dsh.bundle`), pin the latest version and re-install:
+>
+> ```sh
+> npx -y @deepseek-ai/dsh plugin --profile web add dsh-session-management@<latest-version>
+> ```
+>
+> Check the latest version: `npm view dsh-session-management version`.
 
 ### Option 2: from GitHub
 
@@ -81,9 +97,25 @@ The installer is idempotent and safe to re-run. It does two things:
 
 ### Verification & uninstall
 
-After installing, restart `dsh web` — the "Session Manager" entry appears in Settings. You can also confirm the plugin layer with `dsh --profile web --dump-config`. If no entry shows up, the usual culprit is a missing restart.
+After installing, restart `dsh web` — the "Session Manager" entry appears in Settings. You can also confirm the plugin layer with `dsh --profile web --dump-config` (prepend `npx -y @deepseek-ai/dsh` when dsh is not global). If no entry shows up, the usual culprit is a missing restart.
 
-To uninstall, remove `$DSH_HOME/profiles/node_modules/dsh-session-management/`, delete the insert entry from `cordis.patch.yml`, and restart `dsh web`.
+To uninstall, run `dsh plugin --profile web remove dsh-session-management` (prepend `npx -y @deepseek-ai/dsh` when applicable) and restart `dsh web`; for manual installs, remove `$DSH_HOME/profiles/node_modules/dsh-session-management/` and delete the insert entry from `cordis.patch.yml`.
+
+### FAQ
+
+- **`'pnpm' is not recognized` / `pnpm: command not found`**: `dsh plugin` relies on pnpm internally. Install it first:
+
+  ```sh
+  npm install -g pnpm
+  ```
+
+  or enable it via Node's built-in corepack: `corepack enable pnpm`. Verify with `pnpm --version`.
+
+- **An older version is installed / warning `declares no dsh.bundle`**: npm/pnpm metadata caching or a mirror registry delay. Check your registry with `pnpm config get registry` (if it is a mirror like npmmirror, switch back with `pnpm config set registry https://registry.npmjs.org/`), then re-install with the exact version (see the version note above).
+
+- **`ERR_PNPM_IGNORED_BUILDS` on first install**: pnpm refuses build scripts; add the reported packages to `allowBuilds` in the profile's `pnpm-workspace.yaml` and re-run.
+
+- **No "Session Manager" entry in Settings**: make sure you restarted `dsh web`, and that `$DSH_HOME/profiles/web/cordis.patch.yml` contains an insert entry with `id: dsh-session-management`.
 
 ## How it works & limitations
 
