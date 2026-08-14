@@ -1,0 +1,10 @@
+# dsh-session-management bundle patch: inserts its plugin row into the web
+# profile roster. The bundle is the official dsh plugin shape - install it
+# with `dsh plugin --profile web add dsh-session-management`.
+#
+# The single row mounts BOTH halves: the host side (archive / unarchive /
+# delete / export JSON API) and the browser side (the Settings section UI,
+# via the dsh.client declaration in package.json).
+- insert:
+    - id: dsh-session-management
+      name: 'dsh-session-management'
