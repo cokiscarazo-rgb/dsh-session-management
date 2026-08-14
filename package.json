@@ -1,6 +1,6 @@
 {
   "name": "dsh-session-management",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Session management for DSH Web: archive / unarchive / truly delete chats / export data (bilingual). 会话管理：归档 / 取消归档 / 真正删除聊天记录 / 导出数据（中英双语）。",
   "main": "lib/index.js",
   "exports": {
