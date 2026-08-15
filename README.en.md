@@ -4,9 +4,26 @@ English | [中文](README.md)
 
 ![Settings page](docs/screenshots/settings.png)
 
-dsh-session-management is a session management plugin for DeepSeek Harness (DSH) Web. From the Settings panel you can manage chat sessions in one place: archive, unarchive, **truly delete local chat records**, and export data. The UI follows a restrained Apple/macOS design language and is fully bilingual, switching instantly with the DSH locale setting.
+dsh-session-management is a session management plugin for DeepSeek Harness (DSH) Web that **fills the gaps left by the official session management**. From the Settings panel you can manage chat sessions in one place: archive, unarchive, **truly delete local chat records**, and export data in bulk. The UI follows a restrained Apple/macOS design language and is fully bilingual, switching instantly with the DSH locale setting.
 
 ![Archived chats manage dialog](docs/screenshots/manage.png)
+
+## Why this plugin
+
+DSH Web does not ship complete session management today, and long-term users hit three pain points:
+
+- **Chats cannot be truly deleted**: the official UI only offers "archive". Archiving merely hides a session from the sidebar; the chat records stay fully on disk, with no entry point to actually remove them.
+- **Archived chats cannot be restored**: there is no "unarchive". Once archived, a session is unreachable from the list for good — invisible yet still on disk.
+- **Export is one-by-one manual**: the official export handles a single session at a time, which means a lot of clicking once sessions pile up.
+
+This plugin closes all three gaps: **real deletion** (removes the session log files on disk), **restoration** (unarchive one session or a whole group), and **bulk export** (ZIPs identical to the official format).
+
+| Capability | Official DSH | With this plugin |
+| --- | --- | --- |
+| Archive sessions | Supported | Supported, plus one-click archive-all |
+| Unarchive | No entry point | Single / per-workspace / per-month, in bulk |
+| Truly delete chat records | Hidden only, never deleted | Deletes the on-disk log files; running sessions are skipped |
+| Export session data | One at a time, manual | One-click bulk export, byte-compatible with the official format |
 
 ## Features
 
@@ -33,7 +50,11 @@ Archive every session at once: records stay fully intact, merely hidden from the
 
 ### Export data
 
-Reuses the official export endpoint to produce official-format ZIP archives per root session (`dsh-session-<id>.zip`): session log, subagent sessions and media attachments in one package, byte-compatible with the official tooling.
+One-click bulk export of every session: it walks all root sessions (subagent sessions included) and produces an official-format ZIP archive for each (`dsh-session-<id>.zip`) — no more exporting them one by one.
+
+- **Complete contents**: session log, subagent sessions and media attachments in one package;
+- **Format compatible**: byte-compatible with the official export format, ready for the official tooling to inspect or migrate;
+- **Backup before deletion**: run "Export data" before "Delete all chats" to keep what matters while cleaning up the rest.
 
 ### Bilingual UI
 
