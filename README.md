@@ -4,7 +4,7 @@
 
 ![会话管理设置页](docs/screenshots/settings.png)
 
-dsh-session-management 是 DeepSeek Harness（DSH）Web 的会话管理插件，**补足官方会话管理的缺失能力**。在「设置」面板内集中管理聊天会话：归档、取消归档、**真正删除本地聊天记录**、批量导出数据。界面采用克制的 Apple/macOS 设计语言，支持中英双语，随 DSH 语言设置即时切换。
+dsh-session-management 是 DeepSeek Harness（DSH）Web 的会话管理插件，**补足官方会话管理的缺失能力**。在「设置」面板内集中管理聊天会话：归档、取消归档、**真正删除本地聊天记录**、批量导出数据。支持中英双语，随 DSH 语言设置即时切换。
 
 ![已归档聊天管理弹窗](docs/screenshots/manage.png)
 

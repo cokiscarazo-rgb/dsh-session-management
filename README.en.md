@@ -4,7 +4,7 @@ English | [中文](README.md)
 
 ![Settings page](docs/screenshots/settings.png)
 
-dsh-session-management is a session management plugin for DeepSeek Harness (DSH) Web that **fills the gaps left by the official session management**. From the Settings panel you can manage chat sessions in one place: archive, unarchive, **truly delete local chat records**, and export data in bulk. The UI follows a restrained Apple/macOS design language and is fully bilingual, switching instantly with the DSH locale setting.
+dsh-session-management is a session management plugin for DeepSeek Harness (DSH) Web that **fills the gaps left by the official session management**. From the Settings panel you can manage chat sessions in one place: archive, unarchive, **truly delete local chat records**, and export data in bulk. It is fully bilingual, switching instantly with the DSH locale setting.
 
 ![Archived chats manage dialog](docs/screenshots/manage.png)
 
