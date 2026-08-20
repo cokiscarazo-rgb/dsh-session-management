@@ -1,3 +1,5 @@
+
+
 # dsh-session-management · DSH 会话管理
 
 中文 | [English](README.en.md)
@@ -104,6 +106,8 @@ powershell -ExecutionPolicy Bypass -File scripts/install.ps1
 # macOS / Linux
 bash scripts/install.sh
 ```
+
+安装脚本使用环境变量 `DSH_HOME` 定位 DSH 配置目录，未设置时默认 `$HOME/.dsh`。
 
 安装脚本幂等，重复执行安全。它会完成两步：
 
